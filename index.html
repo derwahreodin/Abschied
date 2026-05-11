@@ -404,6 +404,49 @@
       text-transform: uppercase;
       color: rgba(245,240,230,0.2);
     }
+
+    /* ══════════════════════════════════════════
+       MOBILE
+    ══════════════════════════════════════════ */
+    @media (max-width: 600px) {
+      body { padding: 0; }
+
+      .card { width: 100%; box-shadow: none; }
+
+      /* Header: Höhe flexibel, weniger Padding */
+      .header { height: auto; min-height: unset; }
+      .header-inner { padding: 2.4rem 1.4rem; }
+      .header-title { font-size: 1.6rem; }
+      .header-name  { font-size: 2.4rem; }
+      .header-date  { font-size: 0.82rem; letter-spacing: 0.2em; }
+
+      /* Details-Band: untereinander */
+      .details-band { flex-direction: column; align-items: center; }
+      .detail { max-width: 100%; width: 100%; border-left: none !important; border-top: 1px solid rgba(184,137,31,0.18); }
+      .detail:first-child { border-top: none; }
+
+      /* Fotos: untereinander */
+      .photo-row { grid-template-columns: 1fr; height: auto; }
+      .photo-wrap { height: 200px; }
+      .photo-wrap + .photo-wrap { border-left: none; border-top: 3px solid var(--gold); }
+
+      /* RSVP */
+      .rsvp-section { padding: 2rem 1.4rem; }
+      .rsvp-buttons { flex-direction: column; align-items: center; }
+      .btn-yes, .btn-no { width: 100%; max-width: 280px; }
+
+      /* Map */
+      .map-body { grid-template-columns: 1fr; height: auto; }
+      .map-ort-img { height: 200px; border-right: none; border-bottom: 3px solid var(--gold); }
+      .map-section iframe { height: 220px; }
+
+      /* Venue */
+      .venue-section { flex-wrap: wrap; padding: 1.4rem; gap: 1rem; }
+      .venue-divider { display: none; }
+
+      /* Footer */
+      .footer { padding: 0.9rem 1.4rem; }
+    }
   </style>
 </head>
 <body>
