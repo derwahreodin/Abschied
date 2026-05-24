@@ -782,7 +782,13 @@
   /* ── Galerie laden (Cloudinary Tag-List-API) ── */
   async function loadGallery() {
     try {
-      const res  = await fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${TAG}.json`);
+      const res = await fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${TAG}.json`);
+      if (!res.ok) {
+        console.error(`Cloudinary Tag-List: HTTP ${res.status}. Bitte in Cloudinary Dashboard → Settings → Security → "Resource list" aktivieren.`);
+        loading.style.display = 'none';
+        empty.style.display   = 'block';
+        return;
+      }
       const data = await res.json();
       loading.style.display = 'none';
       if (!data.resources || data.resources.length === 0) {
@@ -790,7 +796,8 @@
       } else {
         data.resources.forEach(r => addImage(r.public_id));
       }
-    } catch {
+    } catch (err) {
+      console.error('Galerie konnte nicht geladen werden:', err);
       loading.style.display = 'none';
       empty.style.display   = 'block';
     }
@@ -800,6 +807,7 @@
   const widget = cloudinary.createUploadWidget({
     cloudName:    CLOUD,
     uploadPreset: PRESET,
+    folder:       TAG,
     tags:         [TAG],
     sources:      ['local', 'camera'],
     multiple:     true,
@@ -834,7 +842,6 @@
     if (e.key === 'Escape')     lb.classList.remove('open');
   });
 
-  loadGallery();
 </script>
 </body>
 </html>
