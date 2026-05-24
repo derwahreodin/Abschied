@@ -409,6 +409,24 @@
     }
     .lightbox-close:hover { color: var(--cream); }
 
+    .lightbox-nav {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      font-size: 3.5rem;
+      font-weight: 200;
+      line-height: 1;
+      color: rgba(245,240,230,0.55);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 1rem;
+      transition: color 0.15s;
+      user-select: none;
+    }
+    .lightbox-nav:hover { color: var(--cream); }
+    .lightbox-prev { left: 0.5rem; }
+    .lightbox-next { right: 0.5rem; }
+
     /* Passwort-Gate */
     .pw-input {
       display: block;
@@ -640,7 +658,9 @@
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox">
     <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev">&#8249;</button>
     <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" id="lightbox-next">&#8250;</button>
   </div>
 
   <!-- ═══════════════════════════════
@@ -706,6 +726,9 @@
   const lb      = document.getElementById('lightbox');
   const lbImg   = document.getElementById('lightbox-img');
 
+  const images  = []; // alle Vollbild-URLs in Reihenfolge
+  let   current = 0;
+
   /* ── Galerie entsperren ── */
   function unlockGallery() {
     document.getElementById('gallery-gate').style.display    = 'none';
@@ -734,17 +757,23 @@
   document.getElementById('pw-input')
     .addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
 
+  /* ── Lightbox öffnen / navigieren ── */
+  function openLightbox(index) {
+    current = (index + images.length) % images.length;
+    lbImg.src = images[current];
+    lb.classList.add('open');
+  }
+
   /* ── Bild zur Galerie hinzufügen ── */
   function addImage(publicId) {
     const thumb = `https://res.cloudinary.com/${CLOUD}/image/upload/w_400,h_300,c_fill,q_auto,f_auto/${publicId}`;
     const full  = `https://res.cloudinary.com/${CLOUD}/image/upload/q_auto,f_auto/${publicId}`;
+    const idx   = images.length;
+    images.push(full);
     const item  = document.createElement('div');
     item.className = 'gallery-item';
     item.innerHTML = `<img src="${thumb}" loading="lazy" alt="">`;
-    item.querySelector('img').addEventListener('click', () => {
-      lbImg.src = full;
-      lb.classList.add('open');
-    });
+    item.querySelector('img').addEventListener('click', () => openLightbox(idx));
     grid.appendChild(item);
     empty.style.display   = 'none';
     loading.style.display = 'none';
@@ -786,11 +815,23 @@
   document.getElementById('upload-btn')
     .addEventListener('click', () => widget.open());
 
-  /* ── Lightbox schließen ── */
+  /* ── Lightbox Navigation ── */
   document.getElementById('lightbox-close')
     .addEventListener('click', () => lb.classList.remove('open'));
+  document.getElementById('lightbox-prev')
+    .addEventListener('click', () => openLightbox(current - 1));
+  document.getElementById('lightbox-next')
+    .addEventListener('click', () => openLightbox(current + 1));
+
   lb.addEventListener('click', e => {
     if (e.target === lb) lb.classList.remove('open');
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') openLightbox(current + 1);
+    if (e.key === 'ArrowLeft')  openLightbox(current - 1);
+    if (e.key === 'Escape')     lb.classList.remove('open');
   });
 
   loadGallery();
