@@ -299,15 +299,15 @@
     }
 
     /* ══════════════════════════════════════════
-       RSVP
+       GALERIE
     ══════════════════════════════════════════ */
-    .rsvp-section {
-      padding: 2.6rem 4rem 2.8rem;
+    .gallery-section {
+      padding: 2.6rem 3rem 2.8rem;
       background: var(--navy-deep);
       text-align: center;
     }
 
-    .rsvp-title {
+    .gallery-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.35rem;
       font-weight: 300;
@@ -315,7 +315,8 @@
       color: var(--cream);
       margin-bottom: 0.3rem;
     }
-    .rsvp-sub {
+
+    .gallery-sub {
       font-size: 0.62rem;
       font-weight: 300;
       letter-spacing: 0.2em;
@@ -324,28 +325,47 @@
       margin-bottom: 1.8rem;
     }
 
-    .rsvp-name {
-      display: block;
-      width: 100%;
-      max-width: 320px;
-      margin: 0 auto 1.6rem;
-      padding: 0.8rem 1.2rem;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(184,137,31,0.35);
-      color: var(--cream);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.2s;
-      border-radius: 0;
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
     }
-    .rsvp-name::placeholder { color: rgba(245,240,230,0.25); font-style: italic; }
-    .rsvp-name:focus { border-color: rgba(184,137,31,0.7); }
 
-    .rsvp-buttons { display: flex; gap: 1.2rem; justify-content: center; }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      cursor: pointer;
+    }
 
-    .btn-yes {
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+
+    .gallery-empty {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(245,240,230,0.3);
+      margin-bottom: 1.8rem;
+      display: none;
+    }
+
+    .gallery-loading {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(245,240,230,0.3);
+      margin-bottom: 1.8rem;
+    }
+
+    .btn-upload {
       padding: 0.9rem 2.8rem;
       background: var(--gold);
       border: none;
@@ -358,32 +378,66 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-yes:hover { background: var(--gold-lt); }
+    .btn-upload:hover { background: var(--gold-lt); }
 
-    .btn-no {
-      padding: 0.9rem 2.8rem;
-      background: transparent;
-      border: 1px solid rgba(245,240,230,0.25);
-      color: rgba(245,240,230,0.5);
-      font-family: 'Lato', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 300;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-no:hover { border-color: rgba(245,240,230,0.55); color: var(--cream); }
-
-    .form-msg {
+    /* Lightbox */
+    .lightbox {
       display: none;
-      margin-top: 1.4rem;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem;
-      font-style: italic;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,15,25,0.94);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
     }
-    .form-msg.ok  { color: var(--gold-lt); }
-    .form-msg.err { color: #e8a0a0; }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 92vw;
+      max-height: 88vh;
+      object-fit: contain;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.2rem; right: 1.5rem;
+      font-size: 2rem;
+      color: rgba(245,240,230,0.6);
+      cursor: pointer;
+      line-height: 1;
+      background: none;
+      border: none;
+    }
+    .lightbox-close:hover { color: var(--cream); }
+
+    /* Passwort-Gate */
+    .pw-input {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto 1.2rem;
+      padding: 0.8rem 1.2rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(184,137,31,0.38);
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      text-align: center;
+      outline: none;
+      border-radius: 0;
+      letter-spacing: 0.12em;
+      transition: border-color 0.2s;
+    }
+    .pw-input::placeholder { color: rgba(245,240,230,0.25); font-style: italic; }
+    .pw-input:focus { border-color: rgba(184,137,31,0.7); }
+
+    .pw-error {
+      display: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #e8a0a0;
+      margin-top: 0.9rem;
+    }
 
     /* ══════════════════════════════════════════
        FOOTER
@@ -430,10 +484,10 @@
       .photo-wrap { height: 200px; }
       .photo-wrap + .photo-wrap { border-left: none; border-top: 3px solid var(--gold); }
 
-      /* RSVP */
-      .rsvp-section { padding: 2rem 1.4rem; }
-      .rsvp-buttons { flex-direction: column; align-items: center; }
-      .btn-yes, .btn-no { width: 100%; max-width: 280px; }
+      /* Galerie */
+      .gallery-section { padding: 2rem 1rem; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .btn-upload { width: 100%; max-width: 280px; }
 
       /* Map */
       .map-body { grid-template-columns: 1fr; height: auto; }
@@ -558,32 +612,35 @@
   </div>
 
   <!-- ═══════════════════════════════
-       RSVP
+       GALERIE
   ═══════════════════════════════ -->
-  <div class="rsvp-section">
-    <div class="rsvp-title">Rückmeldung</div>
-    <div class="rsvp-sub">Erbeten bis zum 15. Mai 2026</div>
+  <div class="gallery-section">
 
-    <form id="rsvp-form" action="https://formspree.io/f/xpqbklkl" method="POST">
-      <input
-        type="text"
-        name="name"
-        class="rsvp-name"
-        placeholder="Ihr Name"
-        required
-        autocomplete="name"
-      />
-      <input type="hidden" name="_subject"  value="RSVP – Abschiedsfeier Roland Tegtmeyer"/>
-      <input type="hidden" id="rsvp-status" name="Antwort" value=""/>
+    <!-- Passwort-Gate -->
+    <div id="gallery-gate">
+      <div class="gallery-title">Bildergalerie</div>
+      <div class="gallery-sub">Bitte Passwort eingeben</div>
+      <input type="password" id="pw-input" class="pw-input" placeholder="Passwort">
+      <button id="pw-btn" class="btn-upload">Öffnen</button>
+      <div id="pw-error" class="pw-error">Falsches Passwort – bitte erneut versuchen.</div>
+    </div>
 
-      <div class="rsvp-buttons">
-        <button type="submit" class="btn-yes" data-val="Zusage">Ich komme gerne</button>
-        <button type="submit" class="btn-no"  data-val="Absage">Ich kann leider nicht</button>
-      </div>
+    <!-- Galerie-Inhalt (nach Entsperrung sichtbar) -->
+    <div id="gallery-content" style="display:none">
+      <div class="gallery-title">Bilder vom Abschied</div>
+      <div class="gallery-sub">Teilt eure Erinnerungen</div>
+      <div id="gallery-loading" class="gallery-loading">Bilder werden geladen …</div>
+      <div id="gallery-grid"    class="gallery-grid"></div>
+      <div id="gallery-empty"   class="gallery-empty">Noch keine Bilder – sei der Erste!</div>
+      <button id="upload-btn" class="btn-upload">Foto hochladen</button>
+    </div>
 
-      <div class="form-msg ok"  id="msg-ok">Vielen Dank für Ihre Rückmeldung.</div>
-      <div class="form-msg err" id="msg-err">Etwas ist schiefgelaufen – bitte versuchen Sie es erneut.</div>
-    </form>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <img id="lightbox-img" src="" alt="">
   </div>
 
   <!-- ═══════════════════════════════
@@ -636,33 +693,107 @@
 
 </div>
 
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 <script>
-  const form   = document.getElementById('rsvp-form');
-  const status = document.getElementById('rsvp-status');
+  const CLOUD  = 'dj7dggyyn';
+  const PRESET = 'Abschied';
+  const TAG    = 'abschied';
+  const PW_OK  = 'QWJzY2hpZWQ='; // btoa('Abschied')
 
-  form.querySelectorAll('button[data-val]').forEach(btn => {
-    btn.addEventListener('click', () => { status.value = btn.dataset.val; });
-  });
+  const grid    = document.getElementById('gallery-grid');
+  const empty   = document.getElementById('gallery-empty');
+  const loading = document.getElementById('gallery-loading');
+  const lb      = document.getElementById('lightbox');
+  const lbImg   = document.getElementById('lightbox-img');
 
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const data = new FormData(form);
+  /* ── Galerie entsperren ── */
+  function unlockGallery() {
+    document.getElementById('gallery-gate').style.display    = 'none';
+    document.getElementById('gallery-content').style.display = 'block';
+    loadGallery();
+  }
+
+  /* ── Session prüfen (kein erneutes Eingeben nötig) ── */
+  if (sessionStorage.getItem('gallery_ok') === '1') unlockGallery();
+
+  /* ── Passwort prüfen ── */
+  function checkPw() {
+    const val = document.getElementById('pw-input').value;
+    if (btoa(unescape(encodeURIComponent(val))) === PW_OK) {
+      sessionStorage.setItem('gallery_ok', '1');
+      unlockGallery();
+    } else {
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  }
+
+  document.getElementById('pw-btn')
+    .addEventListener('click', checkPw);
+  document.getElementById('pw-input')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+
+  /* ── Bild zur Galerie hinzufügen ── */
+  function addImage(publicId) {
+    const thumb = `https://res.cloudinary.com/${CLOUD}/image/upload/w_400,h_300,c_fill,q_auto,f_auto/${publicId}`;
+    const full  = `https://res.cloudinary.com/${CLOUD}/image/upload/q_auto,f_auto/${publicId}`;
+    const item  = document.createElement('div');
+    item.className = 'gallery-item';
+    item.innerHTML = `<img src="${thumb}" loading="lazy" alt="">`;
+    item.querySelector('img').addEventListener('click', () => {
+      lbImg.src = full;
+      lb.classList.add('open');
+    });
+    grid.appendChild(item);
+    empty.style.display   = 'none';
+    loading.style.display = 'none';
+  }
+
+  /* ── Galerie laden (Cloudinary Tag-List-API) ── */
+  async function loadGallery() {
     try {
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: data,
-        headers: { Accept: 'application/json' }
-      });
-      if (res.ok) {
-        form.querySelectorAll('input, button').forEach(el => el.style.display = 'none');
-        document.getElementById('msg-ok').style.display = 'block';
+      const res  = await fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${TAG}.json`);
+      const data = await res.json();
+      loading.style.display = 'none';
+      if (!data.resources || data.resources.length === 0) {
+        empty.style.display = 'block';
       } else {
-        document.getElementById('msg-err').style.display = 'block';
+        data.resources.forEach(r => addImage(r.public_id));
       }
     } catch {
-      document.getElementById('msg-err').style.display = 'block';
+      loading.style.display = 'none';
+      empty.style.display   = 'block';
+    }
+  }
+
+  /* ── Upload-Widget ── */
+  const widget = cloudinary.createUploadWidget({
+    cloudName:    CLOUD,
+    uploadPreset: PRESET,
+    tags:         [TAG],
+    sources:      ['local', 'camera'],
+    multiple:     true,
+    maxFiles:     20,
+    cropping:     false,
+    language:     'de',
+  }, (error, result) => {
+    if (!error && result?.event === 'success') {
+      addImage(result.info.public_id);
     }
   });
+
+  document.getElementById('upload-btn')
+    .addEventListener('click', () => widget.open());
+
+  /* ── Lightbox schließen ── */
+  document.getElementById('lightbox-close')
+    .addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', e => {
+    if (e.target === lb) lb.classList.remove('open');
+  });
+
+  loadGallery();
 </script>
 </body>
 </html>
