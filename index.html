@@ -360,6 +360,27 @@
     }
     .gallery-item:hover img { transform: scale(1.05); }
 
+    .gallery-delete {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.3rem;
+      width: 24px;
+      height: 24px;
+      background: rgba(125,31,46,0.88);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      padding: 0;
+    }
+    .gallery-item:hover .gallery-delete { display: flex; }
+
     .gallery-empty {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem;
@@ -792,15 +813,25 @@
   }
 
   /* ── Bild zur Galerie hinzufügen ── */
-  function addImage(publicId) {
+  function addImage(publicId, fbKey) {
     const thumb = `https://res.cloudinary.com/${CLOUD}/image/upload/w_400,h_300,c_fill,q_auto,f_auto/${publicId}`;
     const full  = `https://res.cloudinary.com/${CLOUD}/image/upload/q_auto,f_auto/${publicId}`;
-    const idx   = images.length;
     images.push(full);
     const item  = document.createElement('div');
     item.className = 'gallery-item';
-    item.innerHTML = `<img src="${thumb}" loading="lazy" alt="">`;
-    item.querySelector('img').addEventListener('click', () => openLightbox(idx));
+    item.innerHTML = `<img src="${thumb}" loading="lazy" alt=""><button class="gallery-delete" title="Bild entfernen">&times;</button>`;
+    item.querySelector('img').addEventListener('click', () => {
+      const idx = Array.from(grid.querySelectorAll('.gallery-item')).indexOf(item);
+      openLightbox(idx);
+    });
+    item.querySelector('.gallery-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = Array.from(grid.querySelectorAll('.gallery-item')).indexOf(item);
+      images.splice(idx, 1);
+      if (fbKey) db.ref('gallery/' + fbKey).remove();
+      item.remove();
+      if (grid.querySelectorAll('.gallery-item').length === 0) empty.style.display = 'block';
+    });
     grid.appendChild(item);
     empty.style.display   = 'none';
     loading.style.display = 'none';
@@ -813,11 +844,11 @@
       loading.style.display = 'none';
       const data = snapshot.val();
       if (!data) { empty.style.display = 'block'; return; }
-      const ids = Object.values(data);
-      if (ids.length === 0) {
+      const entries = Object.entries(data);
+      if (entries.length === 0) {
         empty.style.display = 'block';
       } else {
-        ids.forEach(id => addImage(id));
+        entries.forEach(([key, id]) => addImage(id, key));
       }
     } catch (err) {
       console.error('Galerie konnte nicht geladen werden:', err);
@@ -840,8 +871,8 @@
   }, (error, result) => {
     if (!error && result?.event === 'success') {
       const publicId = result.info.public_id;
-      addImage(publicId);
-      db.ref('gallery').push(publicId);
+      const ref = db.ref('gallery').push(publicId);
+      addImage(publicId, ref.key);
     }
   });
 
