@@ -381,6 +381,59 @@
     }
     .gallery-item:hover .gallery-delete { display: flex; }
 
+    /* Bestätigungs-Dialog */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,15,25,0.75);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box {
+      background: var(--navy-deep);
+      border: 1px solid rgba(184,137,31,0.35);
+      padding: 2rem 2.4rem;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+    .confirm-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 1.6rem;
+      line-height: 1.5;
+    }
+    .confirm-buttons { display: flex; gap: 0.8rem; justify-content: center; }
+    .confirm-yes {
+      padding: 0.6rem 1.6rem;
+      background: var(--bordeaux);
+      border: none;
+      color: var(--cream);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .confirm-no {
+      padding: 0.6rem 1.6rem;
+      background: transparent;
+      border: 1px solid rgba(184,137,31,0.4);
+      color: var(--cream);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .confirm-yes:hover { background: #9b2638; }
+    .confirm-no:hover  { border-color: rgba(184,137,31,0.8); }
+
     .gallery-empty {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1rem;
@@ -690,6 +743,17 @@
 
   </div>
 
+  <!-- Bestätigungs-Dialog -->
+  <div id="confirm-overlay" class="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-text">Dieses Bild endgültig löschen?</div>
+      <div class="confirm-buttons">
+        <button class="confirm-yes" id="confirm-yes">Löschen</button>
+        <button class="confirm-no"  id="confirm-no">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox">
     <button class="lightbox-close" id="lightbox-close">&times;</button>
@@ -777,6 +841,18 @@
   const images  = []; // alle Vollbild-URLs in Reihenfolge
   let   current = 0;
 
+  /* ── Bestätigungs-Dialog ── */
+  const confirmOverlay = document.getElementById('confirm-overlay');
+  let pendingDelete = null;
+  document.getElementById('confirm-yes').addEventListener('click', () => {
+    if (pendingDelete) { pendingDelete(); pendingDelete = null; }
+    confirmOverlay.classList.remove('open');
+  });
+  document.getElementById('confirm-no').addEventListener('click', () => {
+    pendingDelete = null;
+    confirmOverlay.classList.remove('open');
+  });
+
   /* ── Galerie entsperren ── */
   function unlockGallery() {
     document.getElementById('gallery-gate').style.display    = 'none';
@@ -826,11 +902,14 @@
     });
     item.querySelector('.gallery-delete').addEventListener('click', e => {
       e.stopPropagation();
-      const idx = Array.from(grid.querySelectorAll('.gallery-item')).indexOf(item);
-      images.splice(idx, 1);
-      if (fbKey) db.ref('gallery/' + fbKey).remove();
-      item.remove();
-      if (grid.querySelectorAll('.gallery-item').length === 0) empty.style.display = 'block';
+      pendingDelete = () => {
+        const idx = Array.from(grid.querySelectorAll('.gallery-item')).indexOf(item);
+        images.splice(idx, 1);
+        if (fbKey) db.ref('gallery/' + fbKey).remove();
+        item.remove();
+        if (grid.querySelectorAll('.gallery-item').length === 0) empty.style.display = 'block';
+      };
+      confirmOverlay.classList.add('open');
     });
     grid.appendChild(item);
     empty.style.display   = 'none';
