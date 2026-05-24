@@ -713,12 +713,25 @@
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 <script>
   const CLOUD  = 'dj7dggyyn';
   const PRESET = 'Abschied';
   const TAG    = 'abschied';
   const PW_OK  = 'QWJzY2hpZWQ='; // btoa('Abschied')
+
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCsAa3m7xghZtre8Xl0LSLFTr1mcwP7zos",
+    authDomain:        "abschied-ca99a.firebaseapp.com",
+    databaseURL:       "https://abschied-ca99a-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "abschied-ca99a",
+    storageBucket:     "abschied-ca99a.firebasestorage.app",
+    messagingSenderId: "161439824458",
+    appId:             "1:161439824458:web:8e7f48318cb80386f7c4b3"
+  });
+  const db = firebase.database();
 
   const grid    = document.getElementById('gallery-grid');
   const empty   = document.getElementById('gallery-empty');
@@ -779,22 +792,18 @@
     loading.style.display = 'none';
   }
 
-  /* ── Galerie laden (Cloudinary Tag-List-API) ── */
+  /* ── Galerie laden (Firebase Realtime Database) ── */
   async function loadGallery() {
     try {
-      const res = await fetch(`https://res.cloudinary.com/${CLOUD}/image/list/${TAG}.json`);
-      if (!res.ok) {
-        console.error(`Cloudinary Tag-List: HTTP ${res.status}. Bitte in Cloudinary Dashboard → Settings → Security → "Resource list" aktivieren.`);
-        loading.style.display = 'none';
-        empty.style.display   = 'block';
-        return;
-      }
-      const data = await res.json();
+      const snapshot = await db.ref('gallery').once('value');
       loading.style.display = 'none';
-      if (!data.resources || data.resources.length === 0) {
+      const data = snapshot.val();
+      if (!data) { empty.style.display = 'block'; return; }
+      const ids = Object.values(data);
+      if (ids.length === 0) {
         empty.style.display = 'block';
       } else {
-        data.resources.forEach(r => addImage(r.public_id));
+        ids.forEach(id => addImage(id));
       }
     } catch (err) {
       console.error('Galerie konnte nicht geladen werden:', err);
@@ -816,7 +825,9 @@
     language:     'de',
   }, (error, result) => {
     if (!error && result?.event === 'success') {
-      addImage(result.info.public_id);
+      const publicId = result.info.public_id;
+      addImage(publicId);
+      db.ref('gallery').push(publicId);
     }
   });
 
